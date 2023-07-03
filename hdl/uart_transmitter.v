@@ -15,163 +15,26 @@ module uart_transmitter
   input                      send_req,
   output reg                 send_ack
 );
+`protected
 
-// -------------------------------------------------------------
-// Signal Declaration
-// -------------------------------------------------------------
-reg [DATA_SIZE      + 1 : 0]  tx_shift_reg      ; // 
-reg [BIT_COUNT_SIZE - 1 : 0]  bit_count         ; // 
-reg                           bit_count_done    ; // 
-reg                           load_tx_shift_reg ; // 
-reg                           shift             ; // 
-reg                           clear             ; // 
+    MTI!#[4_~,;belep<x%u$^Z^l';>[aJ7moJ=3Q>wS"**pXoOCTm'$,B1}#[ZBUYnO^2Xl[E~Z@3=
+    aU$^+K\=DQnSG^O#21C=Kv,]nna#+v;^4jBXE'o?OSQxuU+wo7>XwFvKop2=kTXHAs7~~JAGXYi]
+    A2tKD>IWXKGoK7*[o7#7DY]mEvX;$@k>n<>=Vz+JBK]Ww\[o;-mLzYVi1#*pYCRTr>'Wkal=f'Xm
+    ?*I<jeB'G7VDuj7<}pK$TsuA^Y2~2=>@}q+<C,)Jn~Xp?V_P[#JEY';,p\5sZIBB+[-uEr3v*]o<
+    j3,RN#<jpK\,$<R?Kd^CirCokKy7O0lH1Rkww1VR;\+,,>3]QTquA1}zz3-SN:-{mp&T*s~]e\jV
+    CKw5I2;O,K7Q\3?T[#H.j1#;av1amVQ+'uO,"XQCzslwv'E2$:E^!$Q*z2Oz$'7;7_mriK^+KB]W
+    've?2e]2JTzETB2-}G=#oJF>Q;3]U5lXY,[EB5^rBYw/IQ!!rDnQ|o_AO0aj#K7?Q\s+{m+DX\%g
+    Z}rp"le[n2j7v8"[F>U[zQ^Oux3ew*!'1mn\rG_!^m]]@Es$Jr\vv<v2\UrknzQ5@K&7@lWw^x#I
+    $D[_!vK;a^UBx$5l,}abV|[25x\vARt03e*!7T<!p!\vzY~p'm<$7A1#TXoAL3'jVN1?nnVer^G_
+    p}Y_2{HV!seB,#ei}~9^@@\osBvrxk3$a_$a[~A\5ijaEsYp]V7cuA}iP>nn7xX-YXnClx5lUx<7
+    K7kXB3evOskT$,<2A1LZDWY*UYo.JnEYv~wQ1B~A8r>->3xk#0K5Yx=;,~dWRR$OV1[B?7#C2!KT
+    Q@}r?mVq[7Z@f~H-lx;{5r;;s7E{Tx+_uUQx31-JDHEK3li-2]W,TGJ_{avx-iA\-A-O7pTej<rO
+    {2AYvspeJV<*J+e@a2XZrjR\D['jK3OE=2a$nBusATl-U}?Yc2CB~Y_;[E?vR"lcG@m5WY;pekC<
+    5ZzDAjK5YkVsBpn<<-IGj+JooG1oBroK9Q"eBr]}a>H?oi;z_JRzW3EG!vT}Ijx]=nsBx'nZ,H#p
+    Z>o^[<'d>wlRB?n{{rm71O,QK}RJ_T'usxuYGu}{tw}U<3o<B'am3pXHKr}1Y-V3V$BQ]1_12pUY
+    GAC=YAoXwxCmEol[_!*~+x+ZKOom]G2mo<RAa@7i^mT$-nRT?~H!p;Y!{I}*nfz{+j[+u*kxmmc~
+    'n{5{A['[}kZpO12s2m27X*AouDF;A2VK_]3]xZTI?;aHa+j-aV*a$E7X}J$q=jrBsh=Q~2GA*Ql
+    JEm+5XJR@Yi?YQ}Gse^UYJwOapDUl7CA_RjV^m2}C+OBZm+x>r5Q;Q*BD~7k$[<5HOK]2![IE\7<
+    ]aJa$nY7+'-neZGG~zE-]Z!^[@XEAnT=Kw-GA'pf+ATaIC^w,1$u*IQ$@{Vx-t]*g=2\J3-p~K<
+`endprotected
 
-
-// -------------------------------------------------------------
-// State Encoding
-// -------------------------------------------------------------
-localparam IDLE    = 2'b00,
-           SENDING = 2'b01;
-
-reg [1:0] state, next_state;
-
-
-assign tx = tx_shift_reg[0];
-
-
-// -------------------------------------------------------------
-// Clock
-// -------------------------------------------------------------
-reg [$clog2(CLOCK  ) - 1 : 0] count_clk;
-
-always @(posedge clk or negedge reset_n) begin
-  if(~reset_n) begin
-    count_clk <= 0;
-  end else begin
-    if (state == IDLE) begin
-      count_clk <= 0;
-    end
-    else begin 
-      count_clk <= (count_clk == (CLOCK - 1) ? 0 : (count_clk + 1));
-    end
-  end
-end
-
-
-// -------------------------------------------------------------
-// FSM
-// -------------------------------------------------------------
-always @(posedge clk or negedge reset_n) begin 
-  if(~reset_n) begin
-    state <= IDLE;
-  end
-  // else if (en) begin
-  else begin
-    state <= next_state;
-  end
-end
-
-
-
-
-// -------------------------------------------------------------
-// FSM ouput signal
-// -------------------------------------------------------------
-always @(*)  begin
-  load_tx_shift_reg = 0;
-  shift = 0;
-  clear = 0;
-  // next_state = state;
-
-  case (state)
-    IDLE: begin
-      if (send_req) begin
-        load_tx_shift_reg = 1;
-        next_state = SENDING;
-      end
-      else begin 
-        next_state = IDLE;
-      end
-    end
-
-    SENDING: begin
-      if (count_clk == (CLOCK - 1)) begin
-        if (bit_count_done) begin
-          clear = 1;
-          // shift = 0;
-          next_state = IDLE;
-        end
-        else begin
-          shift = 1;
-          // clear = 0;
-          next_state = SENDING;
-        end
-      end
-      else begin 
-        next_state = SENDING;
-      end
-    end
-
-    default : next_state = IDLE;
-  endcase
-end
-
-
-// -------------------------------------------------------------
-// Counter
-// -------------------------------------------------------------
-always @(posedge clk or negedge reset_n) begin 
-  if(~reset_n) begin
-    bit_count <= 0;
-  end
-  // else if (en) begin
-  else begin
-    if(shift) begin
-      bit_count <= bit_count + 1'b1;
-    end
-    else if (clear) begin
-      bit_count <= 0;
-    end
-    else begin
-      bit_count <= bit_count;
-    end
-  end
-end
-
-always @(*) begin : proc_count_done
-  bit_count_done = (bit_count == (DATA_SIZE + 2));
-end
-
-// assign send_ack = bit_count_done;
-
-always @(posedge clk or negedge reset_n) begin
-  if(~reset_n) begin
-    send_ack <= 0;
-  end else begin
-    send_ack <= ((bit_count == (DATA_SIZE + 2)) & (count_clk == (CLOCK - 1))) ? 1'b1 : 1'b0;
-  end
-end
-
-// -------------------------------------------------------------
-// TX Shift Register
-// -------------------------------------------------------------
-always @(posedge clk or negedge reset_n) begin 
-  if(~reset_n) begin
-    tx_shift_reg <= {(DATA_SIZE+2){1'b1}};
-  end
-  // else if (en) begin
-  else begin
-    if(load_tx_shift_reg) begin
-      tx_shift_reg <= {1'b1, din,1'b0};  end
-    else if (shift) begin
-      tx_shift_reg <= {1'b1,tx_shift_reg[DATA_SIZE:1]};
-    end
-    else begin
-      tx_shift_reg <= tx_shift_reg;
-    end
-  end
-end
-
-
-
-endmodule

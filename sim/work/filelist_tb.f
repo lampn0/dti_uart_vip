@@ -13,13 +13,11 @@
 -y  ../libs/uvm-1.1d/src
 -y  ../src
 
-// -v  ../inc/include_files.svh
-// ../inc/include_files.svh
 ///////////////////////////////////////////////////////////////////////////////
 //  Top Testbench Level Module
 ///////////////////////////////////////////////////////////////////////////////
 
-+define+SYS_FREQ=500000
++define+SYS_FREQ=50000000
 +define+BAUD_RATE=9600
 +define+DATA_SIZE=8
 

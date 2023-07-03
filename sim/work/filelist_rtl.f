@@ -1,9 +1,9 @@
++libext+.v                       // Verilog wrapper files
++libext+.vh                      // Verilog wrapper files
++libext+.sv                      // Verilog wrapper files
+
 //  Design Library
 +incdir+../../hdl
 -y  ../../hdl
 
-//  Include Pat
--v ../../hdl/uart_transmitter.v
--v ../../hdl/uart_receiver.v
 ../../hdl/uart.v
-
