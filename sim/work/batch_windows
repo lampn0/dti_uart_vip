@@ -1,0 +1,8 @@
+// Run each line in command prompt
+
+rm -rf work
+vlib work
+vlog -f filelist_rtl.f  +cover=bcefs -nocoverfec -l ./log/vlogr.log
+vlog -f filelist_tb.f -l ./log/vlogt.log
+vsim -c uart_tb_top -wlf vsim.wlf -solvefaildebug -assertdebug -sva -coverage -voptargs=+acc -l ./log/vsim.log +UVM_VERBOSITY=UVM_MEDIUM -sv_lib ../libs/uvm-1.1d/lib/uvm_dpiWin64 -do "coverage save -onexit -assert -code bcefs -directive -cvg ucdb/uart.ucdb; add wave -r /uart_tb_top/*; run -all; exit"
+vsim -view vsim.wlf -do wave.do
