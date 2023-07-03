@@ -1,0 +1,12 @@
+QuestaSim-64 vlog 10.7d_1 Compiler 2019.05 May  8 2019
+Start time: 16:40:33 on Jul 03,2023
+vlog -f filelist_rtl.f "+cover=bcefs" -nocoverfec -l ./log/vlogr.log 
+-- Compiling module uart
+-- Scanning library directory '../../hdl'
+-- Compiling module uart_transmitter
+-- Compiling module uart_receiver
+
+Top level modules:
+	uart
+End time: 16:40:33 on Jul 03,2023, Elapsed time: 0:00:00
+Errors: 0, Warnings: 0

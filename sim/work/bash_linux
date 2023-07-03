@@ -1,0 +1,10 @@
+#!/bin/bash 
+reset
+UVM_LIB=uvm-1.1d
+
+alias vlb='reset; mkdir -p log; rm -rf work; vlib work'
+alias vlgr='vlog -f filelist_rtl.f  +cover=bcefs -nocoverfec -l ./log/vlogr.log'
+alias vlgt='vlog -f filelist_tb.f -l ./log/vlogt.log'
+alias vlg='vlgr; vlgt'
+alias vsm='vsim -c uart_tb_top -wlf vsim.wlf -solvefaildebug -assertdebug -sva -coverage -voptargs=+acc -l ./log/vsim.log +UVM_VERBOSITY=UVM_MEDIUM -sv_lib ../libs/$UVM_LIB/lib/uvm_dpi64 -do "coverage save -onexit -assert -code bcefs -directive -cvg ucdb/uart.ucdb; add wave -r /uart_tb_top/*; run -all; quit"'
+alias viw='vsim -view vsim.wlf -do wave.do &'
